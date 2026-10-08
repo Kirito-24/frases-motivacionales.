@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Edición | Grandes Ligas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Contenedor del ejército de gatitos -->
+    <div id="gatitos-container"></div>
+
+    <!-- El gatito principal (el jefe) -->
+    <div class="gatito-rebotando" title="¡El jefe de los gatos!">🐱</div>
+
+    <div class="main-container">
+        <!-- APARTADO PARA EL EDITOR (Haz clic aquí para activar el modo admin) -->
+        <div class="editor-badge" onclick="pedirPassword()" title="Clic para desbloquear modo admin">
+            <span class="status-dot" id="puntoEstado"></span> 
+            <span>Modo Editor: <strong id="textoEstado" style="color: #94a3b8;">Bloqueado</strong> | Vistas: <span id="contador-vistas">1</span></span>
+        </div>
+
+        <!-- LA TARJETA PRINCIPAL -->
+        <div class="card">
+            <h1 id="frase">"Las grandes ligas no esperan títulos, premian la ejecución."</h1>
+            <button onclick="cambiarFrase()">Siguiente Frase</button>
+        </div>
+
+        <!-- APARTADO PRIVADO: SOLO APARECE SI INTRODUCES LA CONTRASEÑA -->
+        <div class="input-card oculto" id="panelAdmin">
+            <input type="text" id="nuevaFraseInput" placeholder="Escribe tu nueva frase secreta...">
+            <button onclick="agregarFrase()" class="btn-agregar">Añadir</button>
+        </div>
+    </div>
+
+    <script>
+        let frases = JSON.parse(localStorage.getItem("misFrasesPersonalizadas")) || [
+            "Las grandes ligas no esperan títulos, premian la ejecución.",
+            "Si no encuentras una manera de ganar mientras duermes, trabajarás hasta el día de tu muerte.",
+            "El riesgo más grande es no tomar ninguno.",
+            "Construye tu propio camino o alguien más te contratará para construir el suyo.",
+            "Menos excusas, más código, más acción.",
+            "Un buen editor no solo corta video, dirige la atención del espectador."
+        ];
+
+        let vistas = 1;
+        const PASSWORD_SECRETA = "1234"; // Puedes cambiar tu contraseña aquí cuando quieras
+
+        function cambiarFrase() {
+            const aleatorio = Math.floor(Math.random() * frases.length);
+            document.getElementById("frase").innerText = '"' + frases[aleatorio] + '"';
+            vistas++;
+            document.getElementById("contador-vistas").innerText = vistas;
+        }
+
+        // Función de seguridad: Pide contraseña para desbloquear el panel
+        function pedirPassword() {
+            // Si ya está abierto, lo podemos ocultar o pedir de nuevo
+            const panel = document.getElementById("panelAdmin");
+            
+            if (panel.classList.contains("oculto")) {
+                let intento = prompt("Introduce tu contraseña de editor:");
+                if (intento === PASSWORD_SECRETA) {
+                    panel.classList.remove("oculto");
+                    document.getElementById("textoEstado").innerText = "Activo (Admin)";
+                    document.getElementById("textoEstado").style.color = "#38bdf8";
+                    document.getElementById("puntoEstado").style.backgroundColor = "#22c55e";
+                    alert("¡Acceso concedido! Panel de editor desbloqueado.");
+                } else if (intento !== null) {
+                    alert("Contraseñá incorrecta. Acceso denegado.");
+                }
+            } else {
+                // Si ya estaba abierto, lo volvemos a ocultar por seguridad
+                panel.classList.add("oculto");
+                document.getElementById("textoEstado").innerText = "Bloqueado";
+                document.getElementById("textoEstado").style.color = "#94a3b8";
+                document.getElementById("puntoEstado").style.backgroundColor = "#ef4444";
+            }
+        }
+
+        function agregarFrase() {
+            const input = document.getElementById("nuevaFraseInput");
+            const textoFrase = input.value.trim();
+
+            if (textoFrase !== "") {
+                frases.push(textoFrase);
+                localStorage.setItem("misFrasesPersonalizadas", JSON.stringify(frases));
+                document.getElementById("frase").innerText = '"' + textoFrase + '"';
+                input.value = "";
+                alert("¡Frase guardada permanentemente en tu navegador!");
+            } else {
+                alert("Por favor escribe una frase válida.");
+            }
+        }
+
+        const container = document.getElementById('gatitos-container');
+        for (let i = 0; i < 10; i++) {
+            const gato = document.createElement('div');
+            gato.classList.add('gato-pequeno');
+            gato.innerText = '🐱';
+            gato.style.left = Math.random() * 90 + 'vw';
+            gato.style.top = Math.random() * 90 + 'vh';
+            gato.style.animationDuration = (Math.random() * 2 + 1) + 's';
+            gato.style.animationDelay = (Math.random() * 2) + 's';
+            container.appendChild(gato);
+        }
+    </script>
+
+</body>
+</html>
